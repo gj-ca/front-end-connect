@@ -9,14 +9,13 @@ export default function ProductPage(props) {
         props.history.push("/products")
     }
 
-
     return (
         <>
             <h1>{product.name}</h1>
             <p>Description: {product.description}</p>
             <p>Price: {product.price}</p>
             <p><Link to={`/products/${props.match.params.id}/edit`}>Edit</Link></p>
-            <button onClick={() => handleClick(props.match.params.id)}>Delete</button>
+            <button onClick={() => handleClick(product._id)}>Delete</button>
         </>
     )
 }

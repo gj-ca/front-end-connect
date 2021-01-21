@@ -9,8 +9,20 @@ export default function NewProductForm(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        props.addToProducts(formData)
-        props.history.push("/products")
+        fetch("https://stark-anchorage-67839.herokuapp.com/products/", {
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.status == 201) {
+                props.history.push("/products")
+                props.setReload(true)
+            } else {
+                alert("Fill in the right data, you ding-dong")
+            }
+        })
     }
 
     const handleChange = (event) => {

@@ -6,38 +6,31 @@ import EditProductForm from './EditProductForm'
 import ProductPage from './ProductPage'
 
 export default function App() {
-    const [products, setProducts] = useState([
-        {
-            name: "Product 1",
-            description: "Description 1",
-            price: 10
-        }, 
-        {
-            name: "Product 2",
-            description: "Description 2",
-            price: 20
-        }, 
-        {
-            name: "Product 3",
-            description: "Description 3",
-            price: 30
-        }, 
-    ])
+    const [products, setProducts] = useState([])
+    const [reload, setReload] = useState(true)
 
-    const addToProducts = (newProduct) => {
-        setProducts([...products, newProduct])
-    }
+    useEffect(() => {
+        if (reload == true) {
+            fetch("https://stark-anchorage-67839.herokuapp.com/products")
+                .then(data => data.json())
+                .then(result => {
+                    setProducts(result)
+                    setReload(false)
+                })
+        }
+    }, [reload])
 
-    const updateProducts = (newProduct, index) => {
-        let newProducts = [...products] // Cloning the original array to trigger refresh
-        newProducts[index] = newProduct
-        setProducts(newProducts)
-    }
-
-    const deleteProduct = (index) => {
-        let newProducts = [...products] // Cloning the original array to trigger refresh
-        newProducts.splice(index, 1)
-        setProducts(newProducts)
+    const deleteProduct = (id) => {
+        fetch("https://stark-anchorage-67839.herokuapp.com/products/" + id, {
+            method: "DELETE"
+        })
+            .then(response => {
+                if (response.status == 200) {
+                    let newProducts = [...products] // Cloning the original array
+                    newProducts = newProducts.filter(product => product._id != id)
+                    setProducts(newProducts)
+                }
+            })
     }
 
     return (
@@ -49,11 +42,11 @@ export default function App() {
                 </nav>
             </header>
             <Switch>
-                <Route exact path="/products" render={() => <ProductsIndexPage products={products} deleteProduct={deleteProduct} />}/>
-                <Route exact path="/products/new" render={props => <NewProductForm {...props} addToProducts={addToProducts} />}/>
-                <Route path="/products/:id" render={props => <ProductPage {...props} products={products} deleteProduct={deleteProduct} />}/>
-                <Route path="/products/:id/edit" render={props => <EditProductForm {...props} products={products} updateProducts={updateProducts} />} />
-                <Route path="/recipes" component={() => <h1>Recipes Index Page</h1>}/>
+                <Route exact path="/products" render={() => <ProductsIndexPage products={products} setReload={setReload} deleteProduct={deleteProduct} />}/>
+                <Route exact path="/products/new" render={props => <NewProductForm {...props} setReload={setReload}/>}/>
+                <Route exact path="/products/:id" render={props => <ProductPage {...props} products={products} setReload={setReload} deleteProduct={deleteProduct} />}/>
+                <Route exact path="/products/:id/edit" render={props => <EditProductForm {...props} setReload={setReload} products={products} />} />
+                <Route exact path="/recipes" component={() => <h1>Recipes Index Page</h1>}/>
             </Switch>
         </BrowserRouter>
     )

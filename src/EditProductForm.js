@@ -14,8 +14,21 @@ export default function EditProductForm(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        props.updateProducts(formData, props.match.params.id)
-        props.history.push("/products")
+        // props.updateProducts(formData, props.match.params.id)
+        fetch("https://stark-anchorage-67839.herokuapp.com/products/" + formData._id, {
+            method: "PUT",
+            body: JSON.stringify(formData),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            if (response.status == 200) {
+                props.history.push("/products")
+                props.setReload(true)
+            } else {
+                alert("Fill it in properly")
+            }
+        })
     }
 
     const handleChange = (event) => {
